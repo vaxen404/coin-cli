@@ -31,13 +31,13 @@ Döviz kurlarını takip etmenizi ve elinizdeki paranın kaç Bitcoin (BTC) etti
 
 2. Bağımlılıkları yükleyin:
 
-npm install
+- npm install
 
 
 
 3. Uygulamayı başlatın:
 
-npx tsx src/app.ts
+- npx tsx src/app.ts
 
 
 
