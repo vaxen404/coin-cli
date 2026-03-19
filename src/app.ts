@@ -19,11 +19,11 @@ async function dovizCevirici() {
         
         console.log(chalk.gray("\nVeriler güncelleniyor..."));
 
-        const dovizRes = await axios.get(`https://open.er-api.com/v6/latest/${anaBirim === 'BTC' ? 'USD' : anaBirim}`);
-        const btcRes = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,eur,try")
+        const dovizRes = await fetch(`https://open.er-api.com/v6/latest/${anaBirim === 'BTC' ? 'USD' : anaBirim}`).then(data => data.json()) as any;
+        const btcRes = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,eur,try").then(data => data.json())as any;
 
-        const kurlar = dovizRes.data.rates
-        const btcFiyat = btcRes.data.bitcoin
+        const kurlar = dovizRes.rates
+        const btcFiyat = btcRes.bitcoin
 
         console.log(chalk.cyan.bold(`\n---${miktar} ${anaBirim}---`));
 
