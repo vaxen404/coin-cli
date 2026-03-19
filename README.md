@@ -11,14 +11,17 @@ Döviz kurlarını takip etmenizi ve elinizdeki paranın kaç Bitcoin (BTC) etti
 
 ## 🛠️ Kurulum ve Çalıştırma
 
-1. Depoyu klonlayın:
+1. Depoyu klonlayın
+
 git clone https://github.com/vaxen404/coin-cli.git
 cd coin-cli
 
 2. Bağımlılıkları yükleyin:
+
 npm install
 
 3. Uygulamayı başlatın:
+
 npx tsx src/app.ts
 
 ## 📦 Teknolojiler
