@@ -23,9 +23,9 @@ Döviz kurlarını takip etmenizi ve elinizdeki paranın kaç Bitcoin (BTC) etti
 
 1. Depoyu klonlayın:
 
-git clone https://github.com/vaxen404/coin-cli.git
+- git clone https://github.com/vaxen404/coin-cli.git
 
-cd coin-cli
+- cd coin-cli
 
 
 
