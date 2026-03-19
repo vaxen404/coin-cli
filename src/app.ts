@@ -1,5 +1,6 @@
+import axios from "axios";
 import chalk from "chalk";
-import * as readline from "node:readline/promises"
+import * as readline from "node:readline/promises";
 
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
@@ -11,28 +12,28 @@ async function dovizCevirici() {
 
     try {
         const inputBirim = await rl.question("Hangi birimden çevirmek istersiniz? (USD, TRY, EUR, BTC): ");
-        const anaBirim = inputBirim.toUpperCase().trim();
+        const anaBirim = inputBirim.toUpperCase().trim() || "USD";
         
         const miktarStr = await rl.question(`Kaç ${anaBirim} çevirmek istersiniz?: `);
         const miktar = parseFloat(miktarStr);
 
-        if (isNaN(miktar)) throw new Error("Geçersiz miktar girdiniz!");
+        if (isNaN(miktar)) throw new Error("Geçersiz miktar!");
 
         console.log(chalk.gray("\nVeriler güncelleniyor..."));
 
-        const options = {
-            headers: { 'User-Agent': 'Mozilla/5.0' }
+        // Axios ile istek atıyoruz (headers ekleyerek bot korumasını geçiyoruz)
+        const config = {
+            headers: { 'User-Agent': 'Mozilla/5.0' },
+            timeout: 10000 // 10 saniye sonra vazgeç (bağlantı takılı kalmasın)
         };
 
         const [dovizRes, btcRes] = await Promise.all([
-            fetch(`https://open.er-api.com/v6/latest/${anaBirim === 'BTC' ? 'USD' : anaBirim}`, options).then(res => res.json()),
-            fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,eur,try", options).then(res => res.json())
+            axios.get(`https://open.er-api.com/v6/latest/${anaBirim === 'BTC' ? 'USD' : anaBirim}`, config),
+            axios.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,eur,try", config)
         ]);
 
-        const kurlar = (dovizRes as any).rates;
-        const btcFiyat = (btcRes as any).bitcoin;
-
-        if (!kurlar || !btcFiyat) throw new Error("Veri çekilemedi. İnternetinizi kontrol edin.");
+        const kurlar = dovizRes.data.rates;
+        const btcFiyat = btcRes.data.bitcoin;
 
         console.log(chalk.cyan.bold(`\n--- ${miktar.toLocaleString()} ${anaBirim} ---`));
 
@@ -46,13 +47,20 @@ async function dovizCevirici() {
                     yazdir(b, miktar * kurlar[b], b);
                 }
             });
-
             const miktarInUSD = anaBirim === "USD" ? miktar : miktar / kurlar["USD"];
             const btcSonuc = miktarInUSD / btcFiyat.usd;
             console.log(`${chalk.white("Bitcoin:".padEnd(9))} ${chalk.hex("#FFA500")(btcSonuc.toFixed(8))} BTC`);
         }
+
     } catch (err: any) {
-        console.log(chalk.red(`\nHata: ${err.message}`));
+        // Axios hatalarını daha detaylı yakalayalım
+        if (err.response) {
+            console.log(chalk.red(`\n❌ Sunucu Hatası: ${err.response.status}`));
+        } else if (err.request) {
+            console.log(chalk.red(`\n❌ Ağ Hatası: Sunucuya ulaşılamadı. İnternetinizi kontrol edin.`));
+        } else {
+            console.log(chalk.red(`\n❌ Hata: ${err.message}`));
+        }
     } finally {
         const cevap = await rl.question(chalk.blue("\nTekrar denemek ister misiniz? (e/h): "));
         if (cevap.toLowerCase() === "e") {
