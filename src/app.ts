@@ -1,3 +1,5 @@
+import dns from "node:dns";
+dns.setDefaultResultOrder("ipv4first");
 import chalk from "chalk";
 import * as readline from "node:readline/promises"
 
