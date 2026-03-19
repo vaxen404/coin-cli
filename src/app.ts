@@ -26,22 +26,23 @@ async function dovizCevirici() {
 
         const options = {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            }
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'application/json',
+            },
+            timeout: 10000 
         };
-        
-        const dovizRes = await axios.get(`https://open.er-api.com/v6/latest/${anaBirim === 'BTC' ? 'USD' : anaBirim}`, options);
-        const btcRes = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,eur,try", options);
 
-        if (!dovizRes.data || !btcRes.data) {
-            throw new Error("API'den veri alınamadı. Lütfen internetinizi kontrol edin.");
-        }
+        console.log(chalk.gray("Döviz kurları alınıyor..."));
+        const dovizRes = await axios.get(`https://open.er-api.com/v6/latest/${anaBirim === 'BTC' ? 'USD' : anaBirim}`, options);
+        
+        console.log(chalk.gray("Kripto verileri alınıyor..."));
+        const btcRes = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,eur,try", options);
 
         const kurlar = dovizRes.data.rates;
         const btcFiyat = btcRes.data.bitcoin;
 
         if (!kurlar || !btcFiyat) {
-             throw new Error("Veri formatı hatalı veya birim bulunamadı.");
+            throw new Error("Sunucudan boş veri döndü.");
         }
 
         console.log(chalk.cyan.bold(`\n--- ${miktar.toLocaleString('tr-TR')} ${anaBirim} ---`));
